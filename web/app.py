@@ -19,7 +19,15 @@ from utils import validate_ip, resolve_hostname, validate_port_range
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'scanner-ports-secret-key-2024'
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet', logger=True, engineio_logger=True)
+socketio = SocketIO(
+    app, 
+    cors_allowed_origins="*", 
+    async_mode='eventlet',
+    ping_interval=10,  # Ping toutes les 10 secondes
+    ping_timeout=120,  # Timeout après 120 secondes
+    logger=False,
+    engineio_logger=False
+)
 
 # Stocker les scans en cours
 active_scans = {}
