@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner de Ports Automatique</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Scanner de Ports Automatique</h1>
+            <p class="subtitle">Analyse de sécurité réseau en temps réel</p>
+        </header>
+
+        <!-- Configuration Section -->
+        <section class="config-section">
+            <div class="card">
+                <h2>Configuration du Scan</h2>
+                
+                <div class="form-group">
+                    <label for="target">Cible (IP ou Hostname)</label>
+                    <div class="input-with-validation">
+                        <input 
+                            type="text" 
+                            id="target" 
+                            placeholder="192.168.1.1 ou exemple.com"
+                            autocomplete="off"
+                        >
+                        <span class="validation-status" id="validation-status"></span>
+                    </div>
+                    <small id="target-info"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Type de Scan</label>
+                    <div class="profiles-grid" id="profiles-grid">
+                        <!-- Profils chargés dynamiquement -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="custom-ports">
+                        <input type="checkbox" id="custom-ports-toggle"> 
+                        Ports personnalisés
+                    </label>
+                    <input 
+                        type="text" 
+                        id="custom-ports" 
+                        placeholder="80,443,8000-9000"
+                        disabled
+                    >
+                    <small>Exemples: 80,443 ou 1-1000 ou 80,443,8000-9000</small>
+                </div>
+
+                <div class="form-actions">
+                    <button id="start-scan" class="btn btn-primary" disabled>
+                        Démarrer le Scan
+                    </button>
+                    <button id="stop-scan" class="btn btn-danger" style="display:none;">
+                        Arrêter le Scan
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Section -->
+        <section class="progress-section" id="progress-section" style="display:none;">
+            <div class="card">
+                <h2>Scan en Cours</h2>
+                <div class="scan-info">
+                    <div class="info-item">
+                        <span class="label">Cible:</span>
+                        <span class="value" id="scan-target">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Ports:</span>
+                        <span class="value" id="scan-ports">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Progression:</span>
+                        <span class="value" id="scan-percentage">0%</span>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="scan-stats">
+                    <span id="scan-status">Initialisation...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="results-section" style="display:none;">
+            <div class="card">
+                <div class="results-header">
+                    <h2>Résultats du Scan</h2>
+                    <button id="export-results" class="btn btn-secondary">
+                        Exporter les Résultats
+                    </button>
+                </div>
+
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card stat-total">
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Ports Scannés</div>
+                    </div>
+                    <div class="stat-card stat-open">
+                        <div class="stat-value" id="stat-open">0</div>
+                        <div class="stat-label">Ports Ouverts</div>
+                    </div>
+                    <div class="stat-card stat-closed">
+                        <div class="stat-value" id="stat-closed">0</div>
+                        <div class="stat-label">Ports Fermés</div>
+                    </div>
+                    <div class="stat-card stat-filtered">
+                        <div class="stat-value" id="stat-filtered">0</div>
+                        <div class="stat-label">Ports Filtrés</div>
+                    </div>
+                </div>
+
+                <!-- Scan Details -->
+                <div class="scan-details">
+                    <div class="detail-item">
+                        <span class="label">Durée:</span>
+                        <span class="value" id="scan-duration">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Vitesse:</span>
+                        <span class="value" id="scan-speed">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Heure de fin:</span>
+                        <span class="value" id="scan-time">-</span>
+                    </div>
+                </div>
+
+                <!-- Open Ports Table -->
+                <div class="ports-container">
+                    <h3>Ports Ouverts</h3>
+                    <div id="no-ports-message" style="display:none;">
+                        <p class="info-message">Aucun port ouvert détecté</p>
+                    </div>
+                    <div class="table-container" id="ports-table-container">
+                        <table class="ports-table">
+                            <thead>
+                                <tr>
+                                    <th>Port</th>
+                                    <th>Service</th>
+                                    <th>Catégorie</th>
+                                    <th>Statut</th>
+                                    <th>Bannière</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ports-tbody">
+                                <!-- Rempli dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Warnings -->
+                <div id="warnings-section" style="display:none;">
+                    <h3>Alertes de Sécurité</h3>
+                    <div class="warnings-container" id="warnings-container">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

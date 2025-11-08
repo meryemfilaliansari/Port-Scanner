@@ -1,0 +1,54 @@
+# Configuration du Scanner de Ports
+
+# Paramètres de scan par défaut
+scan:
+  timeout: 1  # Timeout en secondes pour chaque port
+  threads: 100  # Nombre de threads parallèles
+  
+# Types de scans prédéfinis
+scan_profiles:
+  quick:
+    description: "Scan rapide des ports communs"
+    ports: "common"
+    threads: 200
+    timeout: 0.5
+  
+  full:
+    description: "Scan complet de tous les ports"
+    ports: "1-65535"
+    threads: 500
+    timeout: 0.5
+  
+  web:
+    description: "Scan des ports web"
+    ports: "80,443,8000,8080,8443,8888"
+    threads: 50
+    timeout: 2
+  
+  database:
+    description: "Scan des ports de bases de données"
+    ports: "1433,3306,5432,27017,6379,9200"
+    threads: 50
+    timeout: 2
+  
+  safe:
+    description: "Scan lent et discret"
+    ports: "common"
+    threads: 10
+    timeout: 3
+
+# Configuration des rapports
+reports:
+  auto_save: true  # Sauvegarder automatiquement les rapports
+  formats:
+    - console
+    - json
+    - html
+  output_directory: "results"
+
+# Options avancées
+advanced:
+  max_retries: 1  # Nombre de tentatives par port
+  resolve_hostnames: true  # Résoudre les noms d'hôtes
+  banner_grabbing: true  # Tenter de récupérer les bannières
+  verbose: true  # Mode verbose
